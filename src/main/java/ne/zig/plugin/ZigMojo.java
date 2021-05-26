@@ -111,8 +111,8 @@ public class ZigMojo extends AbstractMojo {
     }
 
     private String getArtifactString() {
-        String osName = System.getProperty("os.name").toLowerCase();
-        String osArch = System.getProperty("os.arch").toLowerCase();
+        String osName = System.getProperty("os.name").toLowerCase().replaceAll(" ", "");
+        String osArch = System.getProperty("os.arch").toLowerCase().replaceAll(" ", "");
 
         getLog().info("OS name: " + osName);
         getLog().info("OS Arch: " + osArch);
