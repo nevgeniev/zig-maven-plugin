@@ -1,0 +1,7 @@
+
+
+to test plugin
+
+```
+mvn ne.zig.plugin:zig-maven-plugin:build
+```

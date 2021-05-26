@@ -1,0 +1,9 @@
+<component-set>
+    <components>
+        <component>
+            <role>ne.zig.plugin.ArtifactDownloader</role>
+            <implementation>ne.zig.plugin.ArtifactDownloader</implementation>
+            <instantiation-strategy>per-lookup</instantiation-strategy>
+        </component>
+    </components>
+</component-set>
