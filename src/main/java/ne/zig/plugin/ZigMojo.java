@@ -110,12 +110,9 @@ public class ZigMojo extends AbstractMojo {
         }
     }
 
-    private String getArtifactString() {
-        String osName = System.getProperty("os.name").toLowerCase().replaceAll(" ", "");
-        String osArch = System.getProperty("os.arch").toLowerCase().replaceAll(" ", "");
-
-        getLog().info("OS name: " + osName);
-        getLog().info("OS Arch: " + osArch);
+    private String getArtifactString() throws MojoFailureException {
+        String osName = System.getProperty("os.name").toLowerCase().replaceAll("[^a-z0-9]", "");
+        String osArch = System.getProperty("os.arch").toLowerCase().replaceAll("[^a-z0-9]", "");
 
         if (osName.startsWith("windows")) {
             osName = "windows";
@@ -124,7 +121,7 @@ public class ZigMojo extends AbstractMojo {
         } else if (osName.startsWith("linux")) {
             osName = "linux";
         } else {
-            osName = "unknown";
+            throw new MojoFailureException("Failed to detect OS for: " + System.getProperty("os.name"));
         }
 
         HashSet<String> x86_64 = new HashSet<>(Arrays.asList(
@@ -145,6 +142,8 @@ public class ZigMojo extends AbstractMojo {
             osArch = "i386";
         } else if (aarch64.contains(osArch)) {
             osArch = "aarch64";
+        } else {
+            throw new MojoFailureException("Failed to detect platform arch: " + System.getProperty("os.arch"));
         }
 
         String packaging = osName.equals("windows") ? "zip" : "tar.xz";
