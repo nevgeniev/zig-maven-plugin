@@ -25,7 +25,7 @@ class LibraryHelper {
         if (os.startsWith("windows"))
             return "windows";
         if (os.startsWith("osx") || os.startsWith("macosx"))
-            return "macos";
+            return "osx";
         if (os.startsWith("linux"))
             return "linux";
 
