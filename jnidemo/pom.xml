@@ -1,0 +1,82 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>ne.zig.plugin</groupId>
+  <artifactId>jni-demo</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+  </properties>
+
+  <name>doing jni with zig</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.1</version>
+        <configuration>
+          <compilerArgs>
+            <arg>-h</arg>
+            <arg>${project.build.directory}/generated-include</arg>
+          </compilerArgs>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>ne.zig.plugin</groupId>
+        <artifactId>zig-maven-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <configuration>
+
+          <targets>
+            <target>
+              <platform>x86_64-linux-gnu</platform>
+              <packageName>ne.zig.demo.amd64.linux</packageName>
+            </target>
+            <target>
+              <platform>x86_64-windows-gnu</platform>
+              <packageName>ne.zig.demo.amd64.windows</packageName>
+            </target>
+            <target>
+              <platform>x86_64-macos</platform>
+              <packageName>ne.zig.demo.amd64.osx</packageName>
+            </target>
+<!--
+            <target>
+              <platform>aarch64-macos</platform>
+              <packageName>ne.zig.demo.aarch64.osx</packageName>
+            </target>
+-->
+            <target>
+              <platform>aarch64-linux-gnu</platform>
+              <packageName>ne.zig.demo.aarch64.linux</packageName>
+            </target>
+          </targets>
+        </configuration>
+        <executions>
+          <execution>
+            <id>zig-build</id>
+            <goals>
+              <goal>build</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

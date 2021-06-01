@@ -8,6 +8,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
@@ -30,9 +31,9 @@ import java.util.HashSet;
 import java.util.List;
 
 /**
- * Says "Hi" to the user.
+ * Zig maven plugin. Automaates downloading and execution of <pre>zig build</pre>
  */
-@Mojo(name = "build")
+@Mojo(name = "build", defaultPhase = LifecyclePhase.COMPILE)
 public class ZigMojo extends AbstractMojo {
 
     @Component
@@ -53,64 +54,95 @@ public class ZigMojo extends AbstractMojo {
     @Parameter(defaultValue = "0.7.1")
     private String zigVersion;
 
-    @Parameter
+    @Parameter(readonly = true)
     private String cachePath;
 
-    @Parameter(defaultValue = "${user.home}")
+    @Parameter(defaultValue = "${user.home}", readonly = true)
     private String userHome;
 
-    @Parameter(defaultValue = "true")
+    @Parameter(defaultValue = "true", readonly = true)
     private boolean useRuntimeCache;
+
+    @Parameter(required = true)
+    private List<Target> targets;
+
+    @Parameter(defaultValue = "${project.build.directory}", readonly = true)
+    private String buildDir;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         try {
-            Artifact artifact = downloader.getArtifact(
-                    session, pomRemoteRepositories, getArtifactString()
+            Artifact zigRuntime = downloader.getArtifact(
+                    session, pomRemoteRepositories, getZigArtifactString()
             ).getArtifact();
 
-            File destination = getDestinationFolder(artifact);
+            File destination = getDestinationFolder(zigRuntime);
             if (!destination.exists()) {
                 if (!destination.mkdirs()) {
                     throw new MojoExecutionException("Can't create " + destination.getAbsolutePath());
                 }
-                unpackArtifactToFolder(artifact, destination);
+                unpackArtifactToFolder(zigRuntime, destination, true);
             }
 
-            execZigBuild(destination);
+            Artifact jniIncludes = downloader.getArtifact(
+                    session, pomRemoteRepositories, "org.ziglang:jni-includes:1.0.0:zip"
+            ).getArtifact();
+
+            File includes = getDestinationFolder(jniIncludes);
+            if (!includes.exists()) {
+                if (!includes.mkdirs()) {
+                    throw new MojoExecutionException("Can't create " + includes.getAbsolutePath());
+                }
+                unpackArtifactToFolder(jniIncludes, includes, false);
+            }
+
+
+
+            execZigBuild(destination, includes);
 
         } catch (ArtifactResolverException | NoSuchArchiverException | DigesterException | IOException | InterruptedException e) {
             throw new MojoExecutionException(e.getMessage(), e);
         }
     }
 
-    private void execZigBuild(File runtimePath) throws IOException, InterruptedException, MojoFailureException {
-        ProcessBuilder pb = new ProcessBuilder();
-        pb.command(
-                runtimePath + File.separator + "zig",
-                "build"
-        );
-        pb.redirectErrorStream(true);
-        Process process = pb.start();
+    private void execZigBuild(File runtimePath, File includePath) throws IOException, InterruptedException, MojoFailureException {
+        for (Target target : targets) {
+            getLog().info("Executing zig build for target platform: " + target.getPlatform());
+            ProcessBuilder pb = new ProcessBuilder();
+            pb.environment().put(
+                    "TARGET_LIB_DIR",
+                    "classes" + "/" + target.getPackageName().replaceAll("\\.", "/"));
+            pb.environment().put("JNI_INCLUDES", includePath.getAbsolutePath());
+            pb.command(
+                    runtimePath + File.separator + "zig",
+                    "build",
+                    "-Dtarget=" + target.getPlatform(),
+                    "--cache-dir", buildDir + "/zig-cache",
+                    "--prefix", buildDir
+//                    "--verbose-cc"
+            );
+            pb.redirectErrorStream(true);
+            Process process = pb.start();
 
-        String errorMessage = "zig execution failed";
-        try (BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-            String s;
-            while ((s = stdInput.readLine()) != null) {
-                if (s.startsWith("error: ")) {
-                    errorMessage = s;
+            String errorMessage = "zig execution failed";
+            try (BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String s;
+                while ((s = stdInput.readLine()) != null) {
+                    if (s.startsWith("error: ")) {
+                        errorMessage = s;
+                    }
+                    getLog().info(s);
                 }
-                getLog().info(s);
             }
-        }
 
-        int errCode = process.waitFor();
-        if (errCode != 0) {
-            throw new MojoFailureException(errorMessage);
+            int errCode = process.waitFor();
+            if (errCode != 0) {
+                throw new MojoFailureException(errorMessage);
+            }
         }
     }
 
-    private String getArtifactString() throws MojoFailureException {
+    private String getZigArtifactString() throws MojoFailureException {
         String osName = System.getProperty("os.name").toLowerCase().replaceAll("[^a-z0-9]", "");
         String osArch = System.getProperty("os.arch").toLowerCase().replaceAll("[^a-z0-9]", "");
 
@@ -160,27 +192,29 @@ public class ZigMojo extends AbstractMojo {
         return new File(path);
     }
 
-    private void unpackArtifactToFolder(Artifact artifact, File folder) throws NoSuchArchiverException {
+    private void unpackArtifactToFolder(Artifact artifact, File folder, boolean trimTopFolder) throws NoSuchArchiverException {
         UnArchiver u = archiverManager.getUnArchiver(artifact.getType());
-        u.setFileMappers(new FileMapper[]{new FileMapper() {
-            @Override
-            public String getMappedFileName(String pName) {
-                int idx = pName.indexOf('/');
+        if (trimTopFolder) {
+            u.setFileMappers(new FileMapper[]{new FileMapper() {
+                @Override
+                public String getMappedFileName(String pName) {
+                    int idx = pName.indexOf('/');
 
-                if (idx > 0) {
-                    return idx + 1 < pName.length() ? pName.substring(idx + 1) : "";
+                    if (idx > 0) {
+                        return idx + 1 < pName.length() ? pName.substring(idx + 1) : "";
+                    }
+                    return pName;
                 }
-                return pName;
-            }
-        }});
-        u.setFileSelectors(new FileSelector[]{new FileSelector() {
-            @Override
-            public boolean isSelected(@Nonnull FileInfo fileInfo) {
-                String name = fileInfo.getName();
-                int idx = name.indexOf('/');
-                return idx > 0 && idx + 1 < name.length();
-            }
-        }});
+            }});
+            u.setFileSelectors(new FileSelector[]{new FileSelector() {
+                @Override
+                public boolean isSelected(@Nonnull FileInfo fileInfo) {
+                    String name = fileInfo.getName();
+                    int idx = name.indexOf('/');
+                    return idx > 0 && idx + 1 < name.length();
+                }
+            }});
+        }
         u.setSourceFile(artifact.getFile());
         u.setDestDirectory(folder);
         u.extract();

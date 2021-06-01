@@ -1,6 +1,6 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
- 
+
   <groupId>ne.zig.plugin</groupId>
   <artifactId>zig-maven-plugin</artifactId>
   <version>1.0-SNAPSHOT</version>
@@ -12,9 +12,9 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
- 
-  <name>Sample Parameter-less Maven Plugin</name>
- 
+
+  <name>Zig Maven Plugin</name>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -22,7 +22,7 @@
       <version>3.0</version>
       <scope>provided</scope>
     </dependency>
- 
+
     <!-- dependencies to annotations -->
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
@@ -56,7 +56,7 @@
     </dependency>
   </dependencies>
 
-    <build>
+  <build>
     <plugins>
       <plugin>
         <groupId>ne.zig.plugin</groupId>
