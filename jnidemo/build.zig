@@ -21,8 +21,8 @@ pub fn build(b: *Builder) void {
     const java_home = env.get("JAVA_HOME");
     const jni_md = env.get("JNI_INCLUDES") orelse java_home;
     const target_dir = env.get("TARGET_LIB_DIR");
-    if (target_dir != null) {
-        lib.override_dest_dir = std.build.InstallDir{ .Custom = target_dir orelse unreachable };
+    if (target_dir) |dir| {
+        lib.override_dest_dir = std.build.InstallDir{ .Custom = dir };
     }
 
     const os = target.os_tag orelse builtin.os.tag;
