@@ -41,7 +41,7 @@
         <artifactId>zig-maven-plugin</artifactId>
         <version>1.0-SNAPSHOT</version>
         <configuration>
-          <zigVersion>0.8.0-SNAPSHOT</zigVersion>
+          <zigVersion>0.8.0</zigVersion>
           <targets>
             <target>
               <platform>x86_64-linux-gnu</platform>
