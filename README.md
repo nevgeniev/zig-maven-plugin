@@ -17,11 +17,12 @@ Check `jnidemo` project for quick example how to do it
 How it works
 ===== 
 
-It downloads zig runtime for your platform and caches it in `~/.zig-cache` directory.
-Also, it downloads missing `JNI`headers for cross compilation
+It downloads zig runtime for your platform and caches it in `~/.zigcache` directory.
+Also, it downloads missing `JNI`headers necessary for cross compilation. As of now
+headers are provided for `windows`, `linux`, `osx`
 
 It uses `build.zig` file (must be next to your `pom.xml`) and runs `zig build` according to
-parameters configured for plugin. Check the sample copied from `jnidemo`:
+parameters configured for the plugin. Check the sample `pom.xml` copied from `jnidemo` project:
  
 ```xml
       <plugin>
@@ -60,3 +61,8 @@ parameters configured for plugin. Check the sample copied from `jnidemo`:
       </plugin>
 
 ```
+
+One last thing
+====
+
+You can code `JNI` in zig! Happy hacking :)
