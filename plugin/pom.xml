@@ -3,7 +3,7 @@
 
   <groupId>ne.zig.plugin</groupId>
   <artifactId>zig-maven-plugin</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>0.1.0-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
   <properties>
@@ -11,9 +11,21 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <project.scm.id>github-ne</project.scm.id>
   </properties>
 
   <name>Zig Maven Plugin</name>
+  <scm>
+    <developerConnection>scm:git:https://github.com/nevgeniev/zig-maven-plugin.git</developerConnection>
+  </scm>
+  <distributionManagement>
+    <repository>
+      <id>github</id>
+      <name>GitHub</name>
+      <url>https://maven.pkg.github.com/nevgeniev/zig-maven-plugin</url>
+    </repository>
+  </distributionManagement>
+
 
   <dependencies>
     <dependency>
