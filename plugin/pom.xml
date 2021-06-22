@@ -20,7 +20,7 @@
   </scm>
   <distributionManagement>
     <repository>
-      <id>github</id>
+      <id>ne-github</id>
       <name>GitHub</name>
       <url>https://maven.pkg.github.com/nevgeniev/zig-maven-plugin</url>
     </repository>
