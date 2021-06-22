@@ -3,7 +3,7 @@
 
   <groupId>ne.zig.plugin</groupId>
   <artifactId>zig-maven-plugin</artifactId>
-  <version>0.1.1-SNAPSHOT</version>
+  <version>0.1.1</version>
   <packaging>maven-plugin</packaging>
 
   <properties>
@@ -17,7 +17,7 @@
   <name>Zig Maven Plugin</name>
   <scm>
     <developerConnection>scm:git:https://github.com/nevgeniev/zig-maven-plugin.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>zig-maven-plugin-0.1.1</tag>
   </scm>
   <distributionManagement>
     <repository>
