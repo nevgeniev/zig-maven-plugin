@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>io.github.nevgeniev.zig</groupId>
+  <artifactId>jni-includes</artifactId>
+  <version>1.0.0</version>
+  <packaging>zip</packaging>
+
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>JNI includes for linux/windows/osx</description>
+  <url>https://openjdk.java.net/</url>
+
+
+  <licenses>
+    <license>
+      <name>GPL2 License</name>
+      <url>https://opensource.org/licenses/gpl-2.0.php</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <organization>openjdk</organization>
+      <organizationUrl>https://openjdk.java.net</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:git://github.com/openjdk/jdk</connection>
+    <developerConnection>scm:git:ssh://github.com:openjdk/jdk.git</developerConnection>
+    <url>http://github.com/openjdk/jdk/tree/master</url>
+  </scm>
+</project>

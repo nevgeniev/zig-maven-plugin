@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>io.github.nevgeniev.zig</groupId>
+  <artifactId>zig-linux-x86_64</artifactId>
+  <version>0.8.0</version>
+  <packaging>tar.xz</packaging>
+
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>ziglang runtime for linux x86_64</description>
+  <url>https://ziglang.org/download/</url>
+
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>http://www.opensource.org/licenses/mit-license.php</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>Andrew Kelley</name>
+      <email>andrew@ziglang.org</email>
+      <organization>ziglang</organization>
+      <organizationUrl>http://www.ziglang.org</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:git://github.com/ziglang/zig.git</connection>
+    <developerConnection>scm:git:ssh://github.com:ziglang/zig.git</developerConnection>
+    <url>http://github.com/ziglang/zig/tree/master</url>
+  </scm>
+</project>

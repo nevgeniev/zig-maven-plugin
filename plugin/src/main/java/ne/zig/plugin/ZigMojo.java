@@ -51,7 +51,7 @@ public class ZigMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.remoteArtifactRepositories}", readonly = true, required = true)
     private List<ArtifactRepository> pomRemoteRepositories;
 
-    @Parameter(defaultValue = "0.7.1")
+    @Parameter(defaultValue = "0.8.0")
     private String zigVersion;
 
     @Parameter(readonly = true)
@@ -72,37 +72,30 @@ public class ZigMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         try {
-            Artifact zigRuntime = downloader.getArtifact(
-                    session, pomRemoteRepositories, getZigArtifactString()
-            ).getArtifact();
+            File runtimeDir = fetchArtifact(getZigArtifactString(), true);
+            File includesDir = fetchArtifact("io.github.nevgeniev.zig:jni-includes:1.0.0:zip", false);
 
-            File destination = getDestinationFolder(zigRuntime);
-            if (!destination.exists()) {
-                if (!destination.mkdirs()) {
-                    throw new MojoExecutionException("Can't create " + destination.getAbsolutePath());
-                }
-                unpackArtifactToFolder(zigRuntime, destination, true);
-            }
-
-            Artifact jniIncludes = downloader.getArtifact(
-                    session, pomRemoteRepositories, "org.ziglang:jni-includes:1.0.0:zip"
-            ).getArtifact();
-
-            File includes = getDestinationFolder(jniIncludes);
-            if (!includes.exists()) {
-                if (!includes.mkdirs()) {
-                    throw new MojoExecutionException("Can't create " + includes.getAbsolutePath());
-                }
-                unpackArtifactToFolder(jniIncludes, includes, false);
-            }
-
-
-
-            execZigBuild(destination, includes);
-
+            execZigBuild(runtimeDir, includesDir);
         } catch (ArtifactResolverException | NoSuchArchiverException | DigesterException | IOException | InterruptedException e) {
             throw new MojoExecutionException(e.getMessage(), e);
         }
+    }
+
+    private File fetchArtifact(String artifactName, boolean trimTopFolder)
+            throws ArtifactResolverException, DigesterException, MojoExecutionException, NoSuchArchiverException {
+
+        Artifact artifact = downloader
+                .getArtifact(session, pomRemoteRepositories, artifactName)
+                .getArtifact();
+
+        File destination = getDestinationFolder(artifact);
+        if (!destination.exists()) {
+            if (!destination.mkdirs()) {
+                throw new MojoExecutionException("Can't create " + destination.getAbsolutePath());
+            }
+            unpackArtifactToFolder(artifact, destination, trimTopFolder);
+        }
+        return destination;
     }
 
     private void execZigBuild(File runtimePath, File includePath) throws IOException, InterruptedException, MojoFailureException {
@@ -180,7 +173,7 @@ public class ZigMojo extends AbstractMojo {
 
         String packaging = osName.equals("windows") ? "zip" : "tar.xz";
 
-        return String.format("org.ziglang:zig-%s-%s:%s:%s", osName, osArch, zigVersion, packaging);
+        return String.format("io.github.nevgeniev.zig:zig-%s-%s:%s:%s", osName, osArch, zigVersion, packaging);
     }
 
     private File getDestinationFolder(Artifact artifact) throws DigesterException {
