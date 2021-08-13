@@ -69,6 +69,9 @@ public class ZigMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.build.directory}", readonly = true)
     private String buildDir;
 
+    @Parameter(defaultValue = "${basedir}", readonly = true)
+    private String baseDir;
+
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         try {
@@ -100,8 +103,9 @@ public class ZigMojo extends AbstractMojo {
 
     private void execZigBuild(File runtimePath, File includePath) throws IOException, InterruptedException, MojoFailureException {
         for (Target target : targets) {
-            getLog().info("Executing zig build for target platform: " + target.getPlatform());
+            getLog().info("Executing zig build for target platform: " + target.getPlatform() + " in " + baseDir);
             ProcessBuilder pb = new ProcessBuilder();
+            pb.directory(new File(baseDir));
             pb.environment().put(
                     "TARGET_LIB_DIR",
                     "classes" + "/" + target.getPackageName().replaceAll("\\.", "/"));

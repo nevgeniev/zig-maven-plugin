@@ -4,7 +4,7 @@
 
   <groupId>io.github.nevgeniev.zig</groupId>
   <artifactId>zig-maven-plugin</artifactId>
-  <version>0.2.0</version>
+  <version>0.2.1</version>
   <packaging>maven-plugin</packaging>
 
   <properties>
