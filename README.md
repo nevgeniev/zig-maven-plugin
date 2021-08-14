@@ -28,7 +28,7 @@ parameters configured for the plugin. Check the sample `pom.xml` copied from `jn
       <plugin>
         <groupId>ne.zig.plugin</groupId>
         <artifactId>zig-maven-plugin</artifactId>
-        <version>0.1.0</version>
+        <version>0.2.1</version>
         <configuration>
           <zigVersion>0.8.0</zigVersion>
           <targets>
