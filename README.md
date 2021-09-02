@@ -26,7 +26,7 @@ parameters configured for the plugin. Check the sample `pom.xml` copied from `jn
  
 ```xml
       <plugin>
-        <groupId>ne.zig.plugin</groupId>
+        <groupId>io.github.nevgeniev.zig</groupId>
         <artifactId>zig-maven-plugin</artifactId>
         <version>0.2.1</version>
         <configuration>
