@@ -46,6 +46,9 @@
                         <target>
                             <platform>x86_64-linux-gnu</platform>
                             <packageName>ne.zig.demo.amd64.linux</packageName>
+                            <options>
+                                <cpu>x86_64_v3</cpu>
+                            </options>
                         </target>
                         <target>
                             <platform>x86_64-windows-gnu</platform>

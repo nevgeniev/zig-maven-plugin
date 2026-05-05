@@ -53,8 +53,8 @@ public class ZigBuildMojo extends AbstractMojo {
     @Parameter(defaultValue = "0.16.0")
     private String zigVersion;
 
-    @Parameter(defaultValue = "true")
-    private boolean enableBuildZigZonCache;
+    @Parameter(defaultValue = "true", property = "zigDependencyCache")
+    private boolean dependencyCache;
 
     @Parameter
     private List<ZigDependency> dependencies;
@@ -91,7 +91,7 @@ public class ZigBuildMojo extends AbstractMojo {
     }
 
     private void execZigFetch(File runtimeDir, Map<ZigDependency, Artifact> artifacts) throws IOException, MojoFailureException, InterruptedException {
-        if (enableBuildZigZonCache && !shouldRunZigFetch(artifacts)) {
+        if (dependencyCache && !shouldRunZigFetch(artifacts)) {
             getLog().info("Skipping zig fetch as dependencies are up-to-date");
             return;
         }

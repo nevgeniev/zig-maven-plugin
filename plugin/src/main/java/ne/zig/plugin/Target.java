@@ -1,7 +1,5 @@
 package ne.zig.plugin;
 
-import org.apache.maven.plugins.annotations.Parameter;
-
 import java.util.Properties;
 
 /**
