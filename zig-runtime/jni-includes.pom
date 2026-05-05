@@ -4,8 +4,8 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.nevgeniev.zig</groupId>
   <artifactId>jni-includes</artifactId>
-  <version>1.0.0</version>
-  <packaging>zip</packaging>
+  <version>1.0.1</version>
+  <packaging>tar.xz</packaging>
 
   <name>${project.groupId}:${project.artifactId}</name>
   <description>JNI includes for linux/windows/osx</description>
