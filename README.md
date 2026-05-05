@@ -30,7 +30,7 @@ parameters configured for the plugin. Check the sample `pom.xml` copied from `jn
         <artifactId>zig-maven-plugin</artifactId>
         <version>0.2.1</version>
         <configuration>
-          <zigVersion>0.8.0</zigVersion>
+          <zigVersion>0.16.0</zigVersion>
           <targets>
             <target>
               <platform>x86_64-linux-gnu</platform>

@@ -84,7 +84,7 @@ class LibraryHelper {
             return f.getAbsolutePath();
         }
 
-        URL u = loader.getResource(resPackage + resource);
+        URL u = loader.getResource(resPackage + File.separator + resource);
         Objects.requireNonNull(u, "Can't create resource for " + resPackage + resource);
 
         try (

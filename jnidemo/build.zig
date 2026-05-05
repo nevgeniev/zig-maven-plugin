@@ -1,40 +1,63 @@
 const std = @import("std");
-const builtin = @import("builtin");
-const Builder = std.build.Builder;
 
 
-pub fn build(b: *Builder) void {
+
+pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
-    const mode = b.standardReleaseOptions();
-    const lib = b.addSharedLibrary("hellojni", null, .unversioned);
-
-    lib.addCSourceFile("src/main/zig/jni.c", &[_][]const u8 {
-        "--std=c99"
+    const optimize = b.standardOptimizeOption(.{
+        .preferred_optimize_mode = .ReleaseFast
     });
 
-    lib.setTarget(target);
-    lib.addIncludeDir("target/generated-include");
-    lib.strip = true;
-    lib.linkLibC();
+    const module = b.createModule(.{
+        .target = target,
+        .optimize = optimize,
+        .omit_frame_pointer = false,
+        .link_libc = true
+    });
 
-    const env = b.env_map;
-    const java_home = env.get("JAVA_HOME");
-    const jni_md = env.get("JNI_INCLUDES") orelse java_home;
-    const target_dir = env.get("TARGET_LIB_DIR");
-    if (target_dir) |dir| {
-        lib.override_dest_dir = std.build.InstallDir{ .Custom = dir };
-    }
+    const lib = b.addLibrary(.{
+        .linkage = .dynamic,
+        .name = "hellojni",
+        .root_module = module,
+    });
 
-    const os = target.os_tag orelse builtin.os.tag;
+    module.addCSourceFiles(.{
+        .files = &.{
+            "src/main/zig/jni.c"
+        },
+        .flags = &.{
+            "--std=c99"
+        }
+    });
+
+    configureMavenBuild(b, lib);
+
+    b.installArtifact(lib);
+}
+
+fn configureMavenBuild(b: *std.Build, lib: *std.Build.Step.Compile) void {
+    const java_home  = b.option([] const u8, "MAVEN_BUILD_JAVA_HOME",
+        "JAVA_HOME re-export").?;
+    const target_dir = b.option([] const u8, "MAVEN_BUILD_LIB_DIR", "output folder for the library").?;
+
+    const os = lib.rootModuleTarget().os.tag;
+
+    lib.root_module.addIncludePath(b.path("target/generated-include/")); // or whatever was set for javac -h
+    lib.root_module.addIncludePath(.{ .cwd_relative = b.fmt("{s}/include", .{ java_home })});
+
+    const jni_md = b.dependency("jni-includes_1.0.0", .{}); // jni_md includes for non-native platforms
     const target_os = switch (os) {
         .linux => "linux",
         .windows => "win32",
         .macos => "darwin",
-        else => "unsupported",
+        else => unreachable,
     };
+    lib.root_module.addIncludePath(jni_md.path(b.fmt("include/{s}", .{target_os})));
 
-    lib.addIncludeDir(b.fmt("{s}/include", .{ java_home }));
-    lib.addIncludeDir(b.fmt("{s}/include/{s}", .{ jni_md, target_os }));
-    lib.setBuildMode(mode);
-    lib.install();
+
+    // add copy step
+    const write_files = b.addUpdateSourceFiles();
+    const dst_path = b.fmt("target/{s}/{s}", .{target_dir, lib.out_filename});
+    write_files.addCopyFileToSource(lib.getEmittedBin(), dst_path);
+    b.getInstallStep().dependOn(&write_files.step);
 }
